@@ -1,0 +1,14 @@
+HUONG DAN TAO APK BANG DIEN THOAI ANDROID
+
+Du an da kem workflow GitHub Actions de tu dong bien dich APK tren may chu cua GitHub.
+
+1. Dang nhap github.com va tao repository moi. Nen de Private neu ban khong muon ma nguon cong khai.
+2. Giai nen ZIP nay tren dien thoai.
+3. Tai len TOAN BO NOI DUNG ben trong thu muc CAO_SU_CHECK_Android_Project vao thu muc goc repository GitHub (bao gom thu muc .github; neu khong thay .github trong trinh chon tep, tao thu muc va tep workflow theo duong dan .github/workflows/build-apk.yml).
+4. Commit cac tep len nhanh main.
+5. Mo tab Actions cua repository. Chon workflow "Build CAO SU CHECK APK" va bam Run workflow neu no chua tu chay.
+6. Cho workflow chay xong trang thai xanh (Success).
+7. Mo lan chay do, keo xuong muc Artifacts, tai CAO-SU-CHECK-APK.zip.
+8. Giai nen tren dien thoai; ben trong co app-debug.apk. Bam APK de cai dat.
+
+Luu y: GitHub can tai khoan. Khong chia se mat khau/token GitHub voi bat ky ai. APK debug la ban thu nghiem; truoc khi dung du lieu that, hay thu tao, luu, dong/mo lai va sao luu mot phieu mau.
