@@ -1,14 +1,10 @@
-      - name: Cai Android SDK
-        run: |
-          SDKMANAGER=$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}" -type f -name sdkmanager | sort -V | tail -n 1)
-          echo "SDKMANAGER=$SDKMANAGER"
-          yes | "$SDKMANAGER" --licenses
-          "$SDKMANAGER" --install "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+name: Build CAO SU CHECK APK
 
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -16,32 +12,38 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract project
+      - name: Find and extract project
         run: |
-          unzip CAO_SU_CHECK_Android_Project_MobileBuild.zip
-          cd CAO_SU_CHECK_Android_Project
-          echo "PROJECT_DIR=$PWD" >> $GITHUB_ENV
+          ZIP_FILE=$(find . -maxdepth 1 -type f -iname '*.zip' | head -n 1)
+          if [ -z "$ZIP_FILE" ]; then
+            echo "Khong tim thay file ZIP"
+            exit 1
+          fi
+          mkdir extracted
+          unzip -q "$ZIP_FILE" -d extracted
+          PROJECT_DIR=$(dirname "$(find extracted -name settings.gradle -o -name settings.gradle.kts | head -n 1)")
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "Khong tim thay du an Android"
+            exit 1
+          fi
+          echo "PROJECT_DIR=$GITHUB_WORKSPACE/$PROJECT_DIR" >> "$GITHUB_ENV"
 
-      - name: Set up Java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install SDK
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
+      - name: Setup Android SDK
+        run: |
+          SDKMANAGER=$(find "$ANDROID_HOME" -name sdkmanager -type f | head -n 1)
+          yes | "$SDKMANAGER" --licenses || true
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Build APK
         run: |
@@ -52,4 +54,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: CAO-SU-CHECK-APK
-          path: CAO_SU_CHECK_Android_Project/app/build/outputs/apk/debug/app-debug.apk
+          path: extracted/CAO_SU_CHECK_Android_Project/app/build/outputs/apk/debug/app-debug.apk
